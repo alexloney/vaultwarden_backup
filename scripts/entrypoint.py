@@ -17,6 +17,9 @@ def validate_tz(tz):
 # Create a symbolic link between the timezone and our locally specified timezone file
 def configure_timezone(tz, localtime_file):
     logging.info('Creating timezone symlink')
+    if os.path.exists(localtime_file):
+        logging.info('Removing ' + localtime_file)
+        os.unlink(localtime_file)
     os.symlink('/usr/share/zoneinfo/' + tz, localtime_file)
 
 # If the file exists, check for and remove the entry to execute our `backup.py` script.

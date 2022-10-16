@@ -23,7 +23,7 @@ def is_repo_setup(backup_path):
         os.mkdir(backup_path)
 
     try:
-        _ = git.Repo(backup_path).get_dir
+        _ = git.Repo(backup_path).git_dir
         logging.info("The backup directory contains a GIT repository")
         return True
     except git.exc.InvalidGitRepositoryError:
@@ -102,9 +102,13 @@ def add_commit_and_push(backup_path):
 
     repo = Repo(backup_path)
     repo.git.add(all=True)
-    repo.index.commit('Automated backup on ' + datestr)
-    origin = repo.remote(name='origin')
-    origin.push()
+    if repo.index.diff("HEAD"):
+        repo.index.commit('Automated backup on ' + datestr)
+        origin = repo.remote(name='origin')
+        origin.push()
+        logging.info('Changes pushed')
+    else:
+        logging.info('No changes detected')
 
 if __name__ == '__main__':
     LOG_LEVEL = get_env('LOG_LEVEL', 'info')

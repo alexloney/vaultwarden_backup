@@ -30,4 +30,4 @@ RUN mkdir -m 777 /bitwarden_backup
 RUN mkdir /root/.ssh
 RUN ln -sf "${LOCALTIME_FILE}" /etc/localtime
 
-# ENTRYPOINT ["python3", "/app/entrypoint.py"]
+ENTRYPOINT ["python3", "/app/entrypoint.py"]

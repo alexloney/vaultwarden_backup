@@ -32,14 +32,13 @@ def configure_cron(cron, cron_config_file):
         os.system("sed -i '/backup.py/d' '" + cron_config_file + "'")
     with open(cron_config_file, 'a') as f:
         logging.info('Adding crontab entry')
-        f.write(cron + ' python3 /app/backp.py\n')
+        f.write(cron + ' python3 /app/backup.py\n')
 
 # Execute the `supercronic` command. This will allow the Docker container to remain
 # open and operational, allowing it to follow the predefined cron schedule.
 def start_crontab(cron_config_file):
     logging.info('Executing cron process')
     os.system('supercronic -passthrough-logs -quiet "' + cron_config_file + '"')
-    pass
 
 # When attempting to perform SSH authentication to github, the authorization would
 # fail because our local system does not recognize githubs public key. This will

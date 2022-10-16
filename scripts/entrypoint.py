@@ -56,6 +56,11 @@ def load_github_host():
         os.mkdir('/root/.ssh')
     os.system('ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts')
 
+# Set appropriate permissions on the SSH key otherwise the SSH authentication
+# will fail
+def configure_ssh_key():
+    os.system('chmod 600 /root/.ssh/id_rsa')
+
 # Initializetion function to allow initial setup/configuration sequence.
 def init():
     LOG_LEVEL = get_env('LOG_LEVEL', 'info')
@@ -73,6 +78,7 @@ def init():
 
     configure_timezone(TZ, LOCALTIME_FILE)
     configure_cron(CRON, CRON_CONFIG_FILE)
+    configure_ssh_key()
 
     load_github_host()
 

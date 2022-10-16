@@ -14,7 +14,7 @@ docker run -d --name vaultwarden_backup \
     -v /path/to/id_rsa:/root/.ssh/id_rsa \
     -e CRON='5 * * * *' \
     -e GIT_REPOSITORY_URL='GIT_REPO' \
-    -e TZ=UTC \
+    -e TZ='America/Los_Angeles' \
     -e LOG_LEVEL=info \
     alexloney/vaultwarden_backup:latest
 ```
@@ -27,6 +27,6 @@ Container images are configured using parameters passed at runtime (such as thos
 | `-v /root/.ssh/id_rsa` | The RSA key used for SSH authentication to git |
 | `-e CRON='5 * * * *`` | The cron schedule to run backups on |
 | `-e GIT_REPOSITORY_URL='<GIT_REPO>'` | The git repository to use, in the form `git@...` |
-| `-e TZ=UTC` | The timezone to utilize, important for the cron schedule to be accurate |
+| `-e TZ=UTC` | The timezone to utilize, important for the cron schedule to be accurate. [See here for valid values](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). |
 | `-e LOG_LEVEL=info` | Indicates the level of log verbosity to use. Values are: debug, info, warning, error, and critical |
 

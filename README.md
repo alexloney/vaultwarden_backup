@@ -16,7 +16,7 @@ docker run -d --name vaultwarden_backup \
     -e GIT_REPOSITORY_URL='GIT_REPO' \
     -e TZ='America/Los_Angeles' \
     -e LOG_LEVEL=info \
-    alexloney/vaultwarden_backup:latest
+    ghcr.io/alexloney/vaultwarden_backup:latest
 ```
 
 ## Parameters

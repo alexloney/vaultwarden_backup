@@ -10,6 +10,7 @@ Here are some example snippets to help you get started creating a container.
 ```bash
 docker pull ghcr.io/alexloney/vaultwarden_backup:latest
 docker run -d --name vaultwarden_backup \
+    --restart unless-stopped \
     -v /vw-data/:/data/ \
     -v /path/to/id_rsa:/root/.ssh/id_rsa \
     -e CRON='5 * * * *' \

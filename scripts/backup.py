@@ -12,6 +12,10 @@ from datetime import datetime
 
 from include import *
 
+# Check to see if the repository is set up, this is done by first ensuring that the
+# required backup path folder exists, and if not creating it. Then it checks to see
+# if the backup folder contains a git repository and returns either True or False
+# based on if a repository exists
 def is_repo_setup(backup_path):
     logging.info("Checking to see if " + backup_path + " exists")
     if not os.path.exists(backup_path):
@@ -26,19 +30,24 @@ def is_repo_setup(backup_path):
         logging.info("The backup directory does not contain a GIT repository")
         return False
 
+# Clone the specified repository into the backup path
 def setup_repo(git_repository_url, backup_path):
     logging.info("Checking out " + git_repository_url + " into " + backup_path)
     Repo.clone_from(git_repository_url, backup_path)
 
+# Remove all file contents except for the ".git" folder in a given directory. This
+# is done to allow us to have a fresh commit each time, removing/adding any files
+# that need to be removed/added. Since the git repo inheritly records each commit,
+# there's not a reason to maintain a history within the file structure, instead we
+# can just use the inherit property of a git repo to keep track of the history.
+#
+# To keep it a valid .git repository and avoiding having to checkout the repo every
+# time we run, this will ignore the .git folder.
 def cleanup_repo_contents(backup_path):
     logging.info("Cleaning " + backup_path)
 
     tmpdir = tempfile.mkdtemp()
     logging.info("Created temporary directory: " + tmpdir)
-
-    if os.path.exists(backup_path + '/.git'):
-        logging.info("Moving " + backup_path + "/.git to " + tmpdir + "/.git")
-        shutil.move(backup_path + "/.git", tmpdir + "/.git")
 
     logging.info("Removing all contents from " + backup_path)
     for filename in os.listdir(backup_path):
@@ -46,34 +55,36 @@ def cleanup_repo_contents(backup_path):
         try:
             if os.path.isfile(file_path) or os.path.islink(file_path):
                 os.unlink(file_path)
-            elif os.path.isdir(file_path):
+            elif os.path.isdir(file_path) and file_path != backup_path + '/.git':
                 shutil.rmtree(file_path)
         except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
+            logger.error('Failed to delete %s. Reason: %s' % (file_path, e))
+            sys.exit(1)
 
-    if os.path.exists(tmpdir + '/.git'):
-        logging.info("Restoring " + backup_path + "/.git")
-        shutil.move(tmpdir + "/.git", backup_path + "/.git")
-
+# Backup the SQLite database by using the `.backup` command
 def backup_sqlite(backup_path):
     logging.info("Backing up SQLite database")
     os.system("sqlite3 /data/db.sqlite3 \".backup '" + backup_path + "/db.sqlite3'\"")
 
+# Backup the "Attachments" directory contents
 def backup_attachments(backup_path):
     logging.info("Backing up /data/attachments")
     if os.path.exists('/data/attachments'):
         shutil.copytree('/data/attachments', backup_path + '/attachments')
 
+# Backup the "Sends" directory contents
 def backup_sends(backup_path):
     logging.info("Backing up /data/sends")
     if os.path.exists('/data/sends'):
         shutil.copytree('/data/sends', backup_path + '/sends')
 
+# Backup the "config.json" file
 def backup_config(backup_path):
     logging.info('Backing up /data/config.json')
     if os.path.exists('/data/config.json'):
         shutil.copyfile('/data/config.json', backup_path + '/config.json')
 
+# Backup the RSA keys
 def backup_rsa_keys(backup_path):
     if os.path.exists('/data/rsa_key.pem'):
         logging.info('Backing up /data/rsa_key.pem')
@@ -82,6 +93,8 @@ def backup_rsa_keys(backup_path):
         logging.info('Backing up /data/rsa_key.pub.pem')
         shutil.copyfile('/data/rsa_key.pub.pem', backup_path + '/rsa_key.pub.pem')
 
+# Add all changes to the repository, add a comment indicating the time, and
+# commit/push these changes.
 def add_commit_and_push(backup_path):
     logging.info('Adding commit and pushing repo')
     today = datetime.now()

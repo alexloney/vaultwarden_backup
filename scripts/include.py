@@ -4,6 +4,10 @@ import os
 import sys
 import logging
 
+# Given an environment variable and default value, fetch the variable from the environment
+# if it exists. If it does not exist, return the default value. If no default value is
+# define, then return an error. This allows us to have a default value when possible, or if
+# not possible, give an error.
 def get_env(name, default=None):
     logging.info('Fetching ENV: ' + name)
     if name in os.environ:
@@ -15,7 +19,8 @@ def get_env(name, default=None):
     logging.error('Error: Missing required environment variable ' + name)
     sys.exit(1)
 
-
+# Set the logging level to be used based on a user input, allowing for consistent logging
+# from any of the scripts utilized.
 def configure_logging(log_level):
     root = logging.getLogger()
     handler = logging.StreamHandler(sys.stdout)
@@ -42,5 +47,4 @@ def configure_logging(log_level):
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
     root.addHandler(handler)
-
 

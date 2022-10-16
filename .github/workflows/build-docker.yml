@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is building Docker container
 on:
     push:
         branches:
-            - master
+            - main
 jobs:
     Build-Docker-Container:
         runs-on: ubuntu-latest

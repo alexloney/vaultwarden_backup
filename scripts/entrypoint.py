@@ -27,7 +27,7 @@ def configure_cron(cron, cron_config_file):
 
 def start_crontab(cron_config_file):
     logging.info('Executing cron process')
-    # os.system('supercronic -passthrough-logs -quiet "' + cron_config_file + '"')
+    os.system('supercronic -passthrough-logs -quiet "' + cron_config_file + '"')
     pass
 
 def load_github_host():

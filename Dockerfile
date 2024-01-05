@@ -1,19 +1,9 @@
-FROM alpine:latest
+FROM python:3.9-slim-bullseye
 
-# Add Python and Pip, then use pip to install required Python packages
-RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
-RUN python3 -m ensurepip
-RUN pip3 install --no-cache --upgrade pip setuptools
-RUN pip3 install gitpython
+RUN python3 -m venv /opt/venv
 
-# Add all required packages, this includes SQLite for extracting the
-# database backups and git/OpenSSH for connecting authentication to
-# the git repo. Additionally supercronic for scheduling cron jobs.
-RUN apk add --update sqlite
-RUN apk add --update git
-RUN apk add --update openssh
-RUN apk add --update tzdata
-RUN apk add --update supercronic
+COPY requirements.txt .
+RUN . /opt/venv/bin/activate && pip install -r requirements.txt
 
 # Local file for specifying the local timezone
 ENV LOCALTIME_FILE="/tmp/localtime"
@@ -30,4 +20,4 @@ RUN mkdir /root/.ssh
 RUN ln -sf "${LOCALTIME_FILE}" /etc/localtime
 
 # Execute our entrypoint script to begin the setup and cron monitoring
-ENTRYPOINT ["python3", "/app/entrypoint.py"]
+CMD . /opt/venv/bin/activate && exec python /app/entrypoint.py
